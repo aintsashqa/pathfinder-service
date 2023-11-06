@@ -8,5 +8,5 @@ type Node struct {
 }
 
 func (n *Node) Cost() float64 {
-	return n.Weight + n.Distance
+	return n.Weight * n.Distance
 }
