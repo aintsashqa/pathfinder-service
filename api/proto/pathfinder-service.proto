@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package pathfinder;
+
+option go_package = "./api/proto;proto";
+
+service PathfinderService {
+  rpc GetPath(GetPathRequest) returns (GetPathResponse) {};
+}
+
+message Point {
+  double x = 1;
+  double y = 2;
+}
+
+message Object {
+  Point position = 1;
+  double weight = 2;
+  bool unavailable = 3;
+}
+
+message GetPathRequest {
+  Point entry = 1;
+  Point final = 2;
+  repeated Object objects = 3;
+  double step = 4;
+  bool use_extra_fields = 5;
+}
+
+message GetPathResponse {
+  repeated Point path = 1;
+}
