@@ -96,6 +96,7 @@ func (h *Handler) Handle(_ context.Context, args *Args) (out []types.Point, err 
 				current = current.Previous
 			}
 
+			slices.Reverse(out)
 			break
 		}
 
