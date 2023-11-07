@@ -154,6 +154,120 @@ func TestHandler_Handle(t *testing.T) {
 					err: nil,
 				},
 			},
+			{
+				name: "fail_invalid_entry_point",
+				args: handler.Args{
+					Entry: types.Point{0, 0},
+					Final: types.Point{2, 0},
+					Objects: []*types.Object{
+						{
+							Field: types.Field{
+								Position: types.Point{1, 0},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{-1, 0},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{0, 1},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{0, -1},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+					},
+					Step:           1,
+					UseExtraFields: false,
+				},
+				want: want{
+					path: nil,
+					err:  handler.ErrInvalidPoint,
+				},
+			},
+			{
+				name: "fail_invalid_final_point_using_extra_fields",
+				args: handler.Args{
+					Entry: types.Point{-2, 0},
+					Final: types.Point{0, 0},
+					Objects: []*types.Object{
+						{
+							Field: types.Field{
+								Position: types.Point{1, 0},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{-1, 0},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{0, 1},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{0, -1},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{-1, -1},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{1, -1},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{-1, 1},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+						{
+							Field: types.Field{
+								Position: types.Point{1, 1},
+								Weight:   0,
+							},
+							Unavailable: true,
+						},
+					},
+					Step:           1,
+					UseExtraFields: true,
+				},
+				want: want{
+					path: nil,
+					err:  handler.ErrInvalidPoint,
+				},
+			},
 		}
 	)
 
