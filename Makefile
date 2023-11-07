@@ -16,3 +16,7 @@ tidy:
 .PHONY: vendor
 vendor: tidy
 	@go mod vendor
+
+.PHONY: test
+test:
+	@go test -v ./... -coverprofile coverage.out
