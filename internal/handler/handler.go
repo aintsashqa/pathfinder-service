@@ -2,9 +2,15 @@ package handler
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"slices"
 
 	"github.com/aintsashqa/pathfinder-service/internal/types"
+)
+
+var (
+	ErrInvalidPoint = errors.New("invalid point")
 )
 
 const (
@@ -82,6 +88,14 @@ func (h *Handler) Handle(_ context.Context, args *Args) (out []types.Point, err 
 		)
 	}
 
+	if h.validatePoint(args.Entry, fields, args.Objects) != nil {
+		return nil, fmt.Errorf("%w: entry %s", ErrInvalidPoint, args.Entry.String())
+	}
+
+	if h.validatePoint(args.Final, fields, args.Objects) != nil {
+		return nil, fmt.Errorf("%w: final %s", ErrInvalidPoint, args.Final.String())
+	}
+
 	for len(reachable) > 0 {
 		current := reachable[0]
 		for _, node := range reachable {
@@ -147,4 +161,22 @@ func (h *Handler) Handle(_ context.Context, args *Args) (out []types.Point, err 
 	}
 
 	return
+}
+
+func (h *Handler) validatePoint(p types.Point, fields []*types.Field, objs []*types.Object) error {
+	counter := 0
+
+	for _, field := range fields {
+		current := p.Add(field.Position)
+
+		if slices.ContainsFunc(objs, func(o *types.Object) bool { return o.Position.Eq(current) && o.Unavailable }) {
+			counter++
+		}
+	}
+
+	if counter == len(fields) {
+		return ErrInvalidPoint
+	}
+
+	return nil
 }
