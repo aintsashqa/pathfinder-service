@@ -20,3 +20,8 @@ vendor: tidy
 .PHONY: test
 test:
 	@go test -v ./... -coverprofile coverage.out
+
+.PHONY: dev
+dev:
+	@go build -o bin/pathfinder cmd/pathfinder/main.go
+	@bin/pathfinder
