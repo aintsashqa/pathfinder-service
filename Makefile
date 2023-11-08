@@ -21,6 +21,10 @@ vendor: tidy
 test:
 	@go test -v ./... -coverprofile coverage.out
 
+.PHONY: bench
+bench:
+	@go test -bench . ./... -benchmem
+
 .PHONY: dev
 dev:
 	@go build -o bin/pathfinder cmd/pathfinder/main.go

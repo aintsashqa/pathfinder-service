@@ -283,3 +283,42 @@ func TestHandler_Handle(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkHandler_Handle(b *testing.B) {
+	var (
+		hdlr = handler.New()
+		args = handler.Args{
+			Entry: types.Point{0, 0},
+			Final: types.Point{3, 0},
+			Objects: []*types.Object{
+				{
+					Field: types.Field{
+						Position: types.Point{1, 0},
+						Weight:   0,
+					},
+					Unavailable: true,
+				},
+				{
+					Field: types.Field{
+						Position: types.Point{1, 1},
+						Weight:   0,
+					},
+					Unavailable: true,
+				},
+				{
+					Field: types.Field{
+						Position: types.Point{0, 1},
+						Weight:   0,
+					},
+					Unavailable: true,
+				},
+			},
+			Step:           1,
+			UseExtraFields: false,
+		}
+	)
+
+	for i := 0; i < b.N; i++ {
+		_, _ = hdlr.Handle(context.Background(), &args)
+	}
+}
