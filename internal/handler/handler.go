@@ -35,8 +35,8 @@ type Args struct {
 
 func (h *Handler) Handle(_ context.Context, args *Args) (out []types.Point, err error) {
 	var (
-		explored  []*types.Node
-		reachable = []*types.Node{
+		explored  = make([]*types.Node, 0, 256)
+		reachable = []types.Node{
 			{
 				Position: args.Entry,
 				Weight:   0,
@@ -45,23 +45,11 @@ func (h *Handler) Handle(_ context.Context, args *Args) (out []types.Point, err 
 			},
 		}
 
-		fields = []*types.Field{
-			{
-				Position: types.Point{-args.Step, 0},
-				Weight:   fieldWeight,
-			},
-			{
-				Position: types.Point{0, -args.Step},
-				Weight:   fieldWeight,
-			},
-			{
-				Position: types.Point{args.Step, 0},
-				Weight:   fieldWeight,
-			},
-			{
-				Position: types.Point{0, args.Step},
-				Weight:   fieldWeight,
-			},
+		fields = []types.Field{
+			{Position: types.Point{-args.Step, 0}, Weight: fieldWeight},
+			{Position: types.Point{0, -args.Step}, Weight: fieldWeight},
+			{Position: types.Point{args.Step, 0}, Weight: fieldWeight},
+			{Position: types.Point{0, args.Step}, Weight: fieldWeight},
 		}
 	)
 
@@ -69,22 +57,10 @@ func (h *Handler) Handle(_ context.Context, args *Args) (out []types.Point, err 
 
 	if args.UseExtraFields {
 		fields = append(fields,
-			&types.Field{
-				Position: types.Point{-args.Step, -args.Step},
-				Weight:   extraFieldWeight,
-			},
-			&types.Field{
-				Position: types.Point{args.Step, -args.Step},
-				Weight:   extraFieldWeight,
-			},
-			&types.Field{
-				Position: types.Point{args.Step, args.Step},
-				Weight:   extraFieldWeight,
-			},
-			&types.Field{
-				Position: types.Point{-args.Step, args.Step},
-				Weight:   extraFieldWeight,
-			},
+			types.Field{Position: types.Point{-args.Step, -args.Step}, Weight: extraFieldWeight},
+			types.Field{Position: types.Point{args.Step, -args.Step}, Weight: extraFieldWeight},
+			types.Field{Position: types.Point{args.Step, args.Step}, Weight: extraFieldWeight},
+			types.Field{Position: types.Point{-args.Step, args.Step}, Weight: extraFieldWeight},
 		)
 	}
 
@@ -98,47 +74,43 @@ func (h *Handler) Handle(_ context.Context, args *Args) (out []types.Point, err 
 
 	for len(reachable) > 0 {
 		current := reachable[0]
-		for _, node := range reachable {
-			if node.Cost() < current.Cost() {
-				current = node
+		for i := range reachable {
+			if reachable[i].Cost() < current.Cost() {
+				current = reachable[i]
 			}
 		}
 
 		if current.Position.Eq(args.Final) {
-			for current != nil && !current.Position.Eq(args.Entry) {
+			for !current.Position.Eq(args.Entry) {
 				out = append(out, current.Position)
-				current = current.Previous
+				current = *current.Previous
 			}
 
 			slices.Reverse(out)
 			break
 		}
 
-		reachable = slices.DeleteFunc(reachable, func(n *types.Node) bool {
+		reachable = slices.DeleteFunc(reachable, func(n types.Node) bool {
 			return n == current
 		})
 
-		for _, field := range fields {
-			var (
-				searchable  = current.Position.Add(field.Position)
-				unavailable = false
+		for i := range fields {
+			searchable := current.Position.Add(fields[i].Position)
 
-				exists = slices.ContainsFunc(explored, func(n *types.Node) bool {
-					return n.Position.Eq(searchable)
-				})
-
-				next = types.Node{
-					Position: searchable,
-					Weight:   field.Weight + current.Weight,
-					Distance: searchable.Distance(args.Final),
-					Previous: current,
-				}
-			)
-
-			if exists {
+			if slices.ContainsFunc(explored, func(n *types.Node) bool {
+				return n.Position.Eq(searchable)
+			}) {
 				continue
 			}
 
+			next := types.Node{
+				Position: searchable,
+				Weight:   fields[i].Weight + current.Weight,
+				Distance: searchable.Distance(args.Final),
+				Previous: &current,
+			}
+
+			unavailable := false
 			for _, obj := range args.Objects {
 				if obj.Position.Eq(next.Position) {
 					if obj.Unavailable {
@@ -155,19 +127,19 @@ func (h *Handler) Handle(_ context.Context, args *Args) (out []types.Point, err 
 				continue
 			}
 
-			explored = append(explored, current)
-			reachable = append(reachable, &next)
+			explored = append(explored, &current)
+			reachable = append(reachable, next)
 		}
 	}
 
 	return
 }
 
-func (h *Handler) validatePoint(p types.Point, fields []*types.Field, objs []*types.Object) error {
+func (h *Handler) validatePoint(p types.Point, fields []types.Field, objs []*types.Object) error {
 	counter := 0
 
-	for _, field := range fields {
-		current := p.Add(field.Position)
+	for i := range fields {
+		current := p.Add(fields[i].Position)
 
 		if slices.ContainsFunc(objs, func(o *types.Object) bool { return o.Position.Eq(current) && o.Unavailable }) {
 			counter++
