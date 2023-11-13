@@ -33,7 +33,7 @@ func main() {
 		svc  = delivery.NewGrpcService(hdlr)
 		srv  = grpc.NewServer(
 			grpc.ChainUnaryInterceptor(
-				grpcslog.NewUnaryServerIntercepter(log),
+				grpcslog.NewUnaryServerInterceptor(log),
 			),
 		)
 		lis, err = net.Listen("tcp", ":8080")
