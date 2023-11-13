@@ -28,4 +28,4 @@ bench:
 .PHONY: dev
 dev:
 	@go build -o bin/pathfinder cmd/pathfinder/main.go
-	@bin/pathfinder
+	@bin/pathfinder -dev

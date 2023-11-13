@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log/slog"
 	"net"
 	"os"
@@ -8,14 +9,33 @@ import (
 	"github.com/aintsashqa/pathfinder-service/api/proto"
 	"github.com/aintsashqa/pathfinder-service/internal/delivery"
 	"github.com/aintsashqa/pathfinder-service/internal/handler"
+	grpcslog "github.com/aintsashqa/pathfinder-service/pkg/grpc-slog"
 	"google.golang.org/grpc"
 )
 
+var (
+	dev = flag.Bool("dev", false, "development mode")
+)
+
+func init() {
+	flag.Parse()
+}
+
 func main() {
+	logOptions := slog.HandlerOptions{}
+	log := slog.New(slog.NewJSONHandler(os.Stdout, &logOptions))
+	if *dev {
+		log = slog.New(slog.NewTextHandler(os.Stdout, &logOptions))
+	}
+
 	var (
-		hdlr     = handler.New()
-		svc      = delivery.NewGrpcService(hdlr)
-		srv      = grpc.NewServer()
+		hdlr = handler.New()
+		svc  = delivery.NewGrpcService(hdlr)
+		srv  = grpc.NewServer(
+			grpc.ChainUnaryInterceptor(
+				grpcslog.NewUnaryServerIntercepter(log),
+			),
+		)
 		lis, err = net.Listen("tcp", ":8080")
 	)
 
