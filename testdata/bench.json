@@ -1,0 +1,151 @@
+{
+  "Tests": [
+    {
+      "Name": "small_path",
+      "Value": {
+        "Entry": [
+          0,
+          0
+        ],
+        "Final": [
+          4,
+          0
+        ],
+        "Objects": [
+          {
+            "Position": [
+              1,
+              0
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              1,
+              1
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              0,
+              1
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              3,
+              0
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          }
+        ],
+        "Step": 1,
+        "UseExtraFields": false
+      }
+    },
+    {
+      "Name": "medium_path",
+      "Value": {
+        "Entry": [
+          0,
+          0
+        ],
+        "Final": [
+          4,
+          0
+        ],
+        "Objects": [
+          {
+            "Position": [
+              1,
+              0
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              1,
+              1
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              0,
+              1
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              3,
+              0
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          }
+        ],
+        "Step": 0.5,
+        "UseExtraFields": false
+      }
+    },
+    {
+      "Name": "large_path",
+      "Value": {
+        "Entry": [
+          0,
+          0
+        ],
+        "Final": [
+          4,
+          0
+        ],
+        "Objects": [
+          {
+            "Position": [
+              1,
+              0
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              1,
+              1
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              0,
+              1
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          },
+          {
+            "Position": [
+              3,
+              0
+            ],
+            "Weight": 0,
+            "Unavailable": true
+          }
+        ],
+        "Step": 0.25,
+        "UseExtraFields": false
+      }
+    }
+  ]
+}

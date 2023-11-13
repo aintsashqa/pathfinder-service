@@ -2,6 +2,8 @@ package handler_test
 
 import (
 	"context"
+	"encoding/json"
+	"os"
 	"testing"
 
 	"github.com/aintsashqa/pathfinder-service/internal/handler"
@@ -285,40 +287,32 @@ func TestHandler_Handle(t *testing.T) {
 }
 
 func BenchmarkHandler_Handle(b *testing.B) {
-	var (
-		hdlr = handler.New()
-		args = handler.Args{
-			Entry: types.Point{0, 0},
-			Final: types.Point{3, 0},
-			Objects: []*types.Object{
-				{
-					Field: types.Field{
-						Position: types.Point{1, 0},
-						Weight:   0,
-					},
-					Unavailable: true,
-				},
-				{
-					Field: types.Field{
-						Position: types.Point{1, 1},
-						Weight:   0,
-					},
-					Unavailable: true,
-				},
-				{
-					Field: types.Field{
-						Position: types.Point{0, 1},
-						Weight:   0,
-					},
-					Unavailable: true,
-				},
-			},
-			Step:           1,
-			UseExtraFields: false,
+	type Data struct {
+		Tests []struct {
+			Name  string
+			Value handler.Args
 		}
-	)
+	}
 
-	for i := 0; i < b.N; i++ {
-		_, _ = hdlr.Handle(context.Background(), &args)
+	f, err := os.Open("../../testdata/bench.json")
+	if err != nil {
+		b.Fatalf("unable open file: %v", err)
+	}
+
+	defer func() { _ = f.Close() }()
+
+	var data Data
+	if err := json.NewDecoder(f).Decode(&data); err != nil {
+		b.Fatalf("unable decode data: %v", err)
+	}
+
+	hdlr := handler.New()
+
+	for _, tt := range data.Tests {
+		b.Run(tt.Name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, _ = hdlr.Handle(context.Background(), &tt.Value)
+			}
+		})
 	}
 }
