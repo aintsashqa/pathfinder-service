@@ -40,15 +40,15 @@ func main() {
 	)
 
 	if err != nil {
-		slog.Error("unable to create listener", slog.String("error", err.Error()))
+		log.Error("unable to create listener", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 
 	proto.RegisterPathfinderServiceServer(srv, svc)
 
-	slog.Info("starting server", slog.String("addr", lis.Addr().String()))
+	log.Info("starting server", slog.String("addr", lis.Addr().String()))
 	if err := srv.Serve(lis); err != nil {
-		slog.Error("unable to serve", slog.String("error", err.Error()))
+		log.Error("unable to serve", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 }
