@@ -52,8 +52,8 @@ func (s *GrpcService) GetPath(ctx context.Context, r *proto.GetPathRequest) (*pr
 	}
 
 	path := make([]*proto.Point, 0, len(list))
-	for _, item := range list {
-		point := s.toProtoPoint(item)
+	for i := range list {
+		point := s.toProtoPoint(list[i])
 		path = append(path, &point)
 	}
 
