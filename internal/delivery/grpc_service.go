@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"context"
+	"errors"
 
 	"github.com/aintsashqa/pathfinder-service/api/proto"
 	"github.com/aintsashqa/pathfinder-service/internal/handler"
@@ -43,6 +44,10 @@ func (s *GrpcService) GetPath(ctx context.Context, r *proto.GetPathRequest) (*pr
 
 	list, err := s.handler.Handle(ctx, &args)
 	if err != nil {
+		if errors.Is(err, handler.ErrInvalidPoint) {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
